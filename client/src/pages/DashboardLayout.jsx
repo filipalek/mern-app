@@ -8,7 +8,6 @@ import {
 } from "react-router-dom";
 import Wrapper from "../assets/wrappers/Dashboard";
 import { BigSidebar, Navbar, SmallSidebar, Loading } from "../components";
-import { checkDefaultTheme } from "../App";
 import customFetch from "../utils/customFetch";
 import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
@@ -31,13 +30,13 @@ export const loader = (queryClient) => async () => {
 
 const DashboardContext = createContext();
 
-const DashboardLayout = ({ queryClient }) => {
+const DashboardLayout = ({ isDarkThemeEnabled, queryClient }) => {
   const { user } = useQuery(userQuery).data;
   const navigate = useNavigate();
   const navigation = useNavigation();
   const isPageLoading = navigation.state === "loading";
   const [showSidebar, setShowSidebar] = useState(false);
-  const [isDarkTheme, setIsDarkTheme] = useState(checkDefaultTheme());
+  const [isDarkTheme, setIsDarkTheme] = useState(isDarkThemeEnabled);
   const [isAuthError, setIsAuthError] = useState(false);
 
   const toggleDarkTheme = () => {
