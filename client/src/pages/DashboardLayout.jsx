@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import {
   Outlet,
   redirect,
@@ -36,9 +36,9 @@ const DashboardLayout = ({ queryClient }) => {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const isPageLoading = navigation.state === "loading";
-
   const [showSidebar, setShowSidebar] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(checkDefaultTheme());
+  const [isAuthError, setIsAuthError] = useState(false);
 
   const toggleDarkTheme = () => {
     // console.log("toggle dark theme");
@@ -53,12 +53,28 @@ const DashboardLayout = ({ queryClient }) => {
   };
 
   const logoutUser = async () => {
-    // console.log("logout user");
     navigate("/");
     await customFetch.get("/auth/logout");
     queryClient.invalidateQueries();
     toast.success("Logged out");
   };
+
+  customFetch.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    (error) => {
+      if (error?.response?.status === 401) {
+        setIsAuthError(true);
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  useEffect(() => {
+    if (!isAuthError) return;
+    logoutUser();
+  }, [isAuthError]);
 
   return (
     <DashboardContext.Provider
